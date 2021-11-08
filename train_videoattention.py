@@ -127,28 +127,13 @@ if __name__=='__main__':
 
 
             #pred
-            #print(images.type(),faces.type(),head_channel.type())
             pred_heatmap,pred_inout = model(images,faces,head_channel)
-            #print(pred_inout.shape,gaze_inout.shape)
-            #pred_depthmap = pred_depthmap.squeeze(1)
+
             pred_heatmap = pred_heatmap.squeeze(1)
             gaze_heatmap = gaze_heatmap.squeeze(1)
 
             pred_location = softargmax2d(pred_heatmap,device=device)
-            #print(pred_location/output_resolution,gaze_location)
-            # loss_direction = mse_loss(pred_direction,gaze_direction)
-            # loss_direction = torch.mean(loss_direction, dim=1)
-            # loss_direction = torch.mul(loss_direction, gaze_inside)
-            # loss_direction = torch.sum(loss_direction) / torch.sum(gaze_inside)*100
 
-            #depth_map_loss = huber_loss(pred_depthmap,depth)*100
-
-            #l2_loss_1 = torch.mean(l2_loss_1, dim=1)
-            #l2_loss_1 = torch.mul(l2_loss_1, gaze_inside)
-            #l2_loss_1 = torch.sum(l2_loss_1) / torch.sum(gaze_inside)*100
-
-            #inout_loss = inout_cross_entropy_loss(pred_inout,gaze_inout)*100
-            #inout_loss = 0
             inout_loss = bcelogit_loss(pred_inout.squeeze(), gaze_inside.squeeze()) * 100
 
             l2_loss_1 = mse_loss(gaze_location, pred_location/output_resolution)
@@ -204,18 +189,13 @@ if __name__=='__main__':
                         val_images = val_image.cuda().to(device).to(torch.float64)
                         val_faces = val_face.cuda().to(device).to(torch.float64)
                         val_head_channel = val_head_channel.cuda().to(device).to(torch.float64)
-                        #val_label_heatmap = val_label_heatmap.cuda().to(device)
-                        #val_gaze_location = val_gaze_location.cuda().to(device).to(torch.float64)
 
                         val_pred_heatmap,val_pred_inout = model(val_images, val_faces,val_head_channel)
-                        #val_pred_depthmap = val_pred_depthmap.squeeze(1)
                         val_pred_heatmap = val_pred_heatmap.squeeze(1)
                         val_pred_inout = val_pred_inout.cpu()
 
                         val_pred_location = softargmax2d(val_pred_heatmap,device=device).cpu()
-                        #val_pred_depthmap = val_pred_depthmap.cpu()
                         val_pred_heatmap = val_pred_heatmap.cpu()
-                        #val_depth = val_depth.cpu()
 
                         for b_i in range(len(val_gaze_inside)):
                             class_count +=1

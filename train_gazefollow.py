@@ -112,10 +112,7 @@ if __name__=='__main__':
 
     # Loss functions
     mse_loss = nn.MSELoss(reduce=False) # not reducing in order to ignore outside cases
-    # l1_criterion = nn.L1Loss()
     bcelogit_loss = nn.BCEWithLogitsLoss()
-    # cross_loss = nn.CrossEntropyLoss()
-    # smooth_crit = nn.SmoothL1Loss()
 
     # Optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -137,23 +134,18 @@ if __name__=='__main__':
             head_channel = head_channel.cuda().to(device)
             gaze_location = gaze_location.cuda().to(device)
             gaze_heatmap = gaze_heatmap.cuda().to(device)
-            #loss_weight = loss_weight.cuda().to(device)
             gaze_inside = gaze_inside.cuda(device)
             gaze_inout = gaze_inside.long()
 
 
             pred_heatmap,inout_pred = model(images,faces,head_channel)
-            #print(pred_inout.shape,gaze_inout.shape)
-            #pred_depthmap = pred_depthmap.squeeze(1)
+
             pred_heatmap = pred_heatmap.squeeze(1)
             gaze_heatmap = gaze_heatmap.squeeze(1)
 
             pred_location = softargmax2d(pred_heatmap,device=device).float()
 
-
-            #inout_loss = inout_cross_entropy_loss(pred_inout,gaze_inout)*100
             Xent_loss = bcelogit_loss(inout_pred.squeeze(), gaze_inside.squeeze())*100
-            #inout_loss = 0
 
             l2_loss_1 = mse_loss(gaze_location, pred_location/output_resolution)
             l2_loss_1 = torch.mean(l2_loss_1, dim=1)
@@ -175,7 +167,6 @@ if __name__=='__main__':
             step += 1
             #end = time.time()
             if batch % print_every ==0:
-                #print('awl: ',awl.params,end =' ')
                 print("Epoch:{:04d}\tstep:{:06d}/{:06d}\ttraining loss: (total_loss){:.4f} (heatmap_loss){:.4f} (location_loss){:.4f} (inout_loss){:.4f}".format(ep, batch + 1,max_steps, total_loss,heatmap_loss,location_loss,Xent_loss))
                 # Tensorboard
                 ind = np.random.choice(len(images), replace=False)
