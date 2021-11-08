@@ -35,8 +35,11 @@ or
 test multi-person gaze-following:
 >python videoattention_face_gaze_detection_shared_save.py
 
-#reference
+# reference
 [Attention-Target-Detection](https://github.com/ejcgt/attention-target-detection)
+
 [GhostNet](https://github.com/iamhankai/ghostnet.pytorch)
-[yolov5-face](https://github.com/deepcam-cn/yolov5-face])
+
+[yolov5-face](https://github.com/deepcam-cn/yolov5-face)
+
 [softargmax](https://github.com/david-wb/softargmax/blob/master/softargmax.py)
